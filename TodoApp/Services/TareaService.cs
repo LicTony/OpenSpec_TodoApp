@@ -100,6 +100,27 @@ public class TareaService
     }
     
     /// <summary>
+    /// Actualiza la descripción de una tarea existente
+    /// </summary>
+    public void ActualizarDescripcion(int id, string nuevaDescripcion)
+    {
+        if (string.IsNullOrWhiteSpace(nuevaDescripcion))
+        {
+            throw new ArgumentException("La descripción no puede estar vacía", nameof(nuevaDescripcion));
+        }
+        
+        var tarea = _repository.ObtenerPorId(id);
+        
+        if (tarea == null)
+        {
+            throw new InvalidOperationException($"No se encontró la tarea con ID {id}");
+        }
+        
+        tarea.Descripcion = nuevaDescripcion.Trim();
+        _repository.Actualizar(tarea);
+    }
+
+    /// <summary>
     /// Elimina una tarea con validación de existencia
     /// </summary>
     public void EliminarTarea(int id)
