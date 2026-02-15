@@ -26,6 +26,22 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<Tarea> _tareas;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TotalPaginas))]
+    [NotifyCanExecuteChangedFor(nameof(PaginaSiguienteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(PaginaAnteriorCommand))]
+    private int _paginaActual = 1;
+
+    [ObservableProperty]
+    private int _tamañoPagina = 10;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TotalPaginas))]
+    [NotifyCanExecuteChangedFor(nameof(PaginaSiguienteCommand))]
+    private int _totalRegistros;
+
+    public int TotalPaginas => (int)Math.Ceiling((double)TotalRegistros / TamañoPagina);
+
     public MainViewModel(TareaService tareaService, IDialogService dialogService)
     {
         _tareaService = tareaService;
@@ -37,9 +53,34 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void CargarTareas()
     {
-        var tareas = _tareaService.ObtenerTareas(FiltroActual, OrdenActual);
-        Tareas = new ObservableCollection<Tarea>(tareas);
+        var resultado = _tareaService.ObtenerTareas(FiltroActual, OrdenActual, PaginaActual, TamañoPagina);
+        Tareas = new ObservableCollection<Tarea>(resultado.Items);
+        TotalRegistros = resultado.TotalRegistros;
     }
+
+    [RelayCommand(CanExecute = nameof(PuedeIrAPaginaAnterior))]
+    private void PaginaAnterior()
+    {
+        if (PaginaActual > 1)
+        {
+            PaginaActual--;
+            CargarTareas();
+        }
+    }
+
+    private bool PuedeIrAPaginaAnterior() => PaginaActual > 1;
+
+    [RelayCommand(CanExecute = nameof(PuedeIrAPaginaSiguiente))]
+    private void PaginaSiguiente()
+    {
+        if (PaginaActual < TotalPaginas)
+        {
+            PaginaActual++;
+            CargarTareas();
+        }
+    }
+
+    private bool PuedeIrAPaginaSiguiente() => PaginaActual < TotalPaginas;
 
     [RelayCommand]
     private void AgregarTarea()
@@ -55,11 +96,13 @@ public sealed partial class MainViewModel : ObservableObject
             _tareaService.CrearTarea(NuevaTareaDescripcion, NuevaTareaPrioridad);
             NuevaTareaDescripcion = string.Empty;
             NuevaTareaPrioridad = Prioridad.Media;
+            // Al agregar una nueva tarea, usualmente queremos verla, 
+            // pero si estamos en otra página podría no aparecer.
+            // Por simplicidad, recargamos la página actual.
             CargarTareas();
         }
         catch (Exception ex)
         {
-            // TODO: Manejar error, quizás con un servicio de diálogos
             System.Diagnostics.Debug.WriteLine($"Error al crear tarea: {ex.Message}");
             _dialogService.Alert($"No se pudo crear la tarea: {ex.Message}", "Error");
         }
@@ -112,11 +155,13 @@ public sealed partial class MainViewModel : ObservableObject
 
     partial void OnFiltroActualChanged(FiltroTareas value)
     {
+        PaginaActual = 1;
         CargarTareas();
     }
 
     partial void OnOrdenActualChanged(OrdenTareas value)
     {
+        PaginaActual = 1;
         CargarTareas();
     }
 }

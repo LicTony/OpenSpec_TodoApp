@@ -14,7 +14,7 @@
                             MethodName="GetValues"
                             ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="services:FiltroTareas"/>
+                <x:Type TypeName="models:FiltroTareas"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <ObjectDataProvider x:Key="PrioridadValues"
@@ -28,7 +28,7 @@
                             MethodName="GetValues"
                             ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="services:OrdenTareas"/>
+                <x:Type TypeName="models:OrdenTareas"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
@@ -39,6 +39,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -149,5 +150,30 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!-- Pagination Bar -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button Content="Anterior" 
+                    Command="{Binding PaginaAnteriorCommand}" 
+                    Padding="15,5" 
+                    Background="#f0f0f0" 
+                    BorderBrush="#ccc" BorderThickness="1"/>
+            
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                <TextBlock Text="Página " Foreground="#666"/>
+                <TextBlock Text="{Binding PaginaActual}" FontWeight="Bold" Foreground="#333"/>
+                <TextBlock Text=" de " Foreground="#666"/>
+                <TextBlock Text="{Binding TotalPaginas}" FontWeight="Bold" Foreground="#333"/>
+                <TextBlock Text=" (" Foreground="#666"/>
+                <TextBlock Text="{Binding TotalRegistros}" Foreground="#666"/>
+                <TextBlock Text=" tareas)" Foreground="#666"/>
+            </StackPanel>
+
+            <Button Content="Siguiente" 
+                    Command="{Binding PaginaSiguienteCommand}" 
+                    Padding="15,5" 
+                    Background="#f0f0f0" 
+                    BorderBrush="#ccc" BorderThickness="1"/>
+        </StackPanel>
     </Grid>
 </Window>

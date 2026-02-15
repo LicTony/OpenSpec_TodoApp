@@ -47,33 +47,30 @@ public class TareaService
     }
     
     /// <summary>
-    /// Obtiene tareas con filtrado y ordenamiento
+    /// Obtiene tareas con filtrado, ordenamiento y paginación
     /// </summary>
-    public List<Tarea> ObtenerTareas(FiltroTareas filtro = FiltroTareas.Todas, OrdenTareas orden = OrdenTareas.FechaCreacion)
+    public ResultadoPaginado<Tarea> ObtenerTareas(
+        FiltroTareas filtro = FiltroTareas.Todas, 
+        OrdenTareas orden = OrdenTareas.FechaCreacion,
+        int paginaActual = 1,
+        int tamañoPagina = 10)
     {
-        List<Tarea> tareas;
+        // Validaciones básicas de paginación
+        if (paginaActual < 1) paginaActual = 1;
+        if (tamañoPagina < 1) tamañoPagina = 10;
+
+        int skip = (paginaActual - 1) * tamañoPagina;
         
-        // Aplicar filtro
-        switch (filtro)
-        {
-            case FiltroTareas.Pendientes:
-                tareas = _repository.ObtenerPorEstado(false);
-                break;
-            case FiltroTareas.Completadas:
-                tareas = _repository.ObtenerPorEstado(true);
-                break;
-            case FiltroTareas.Todas:
-            default:
-                tareas = _repository.ObtenerTodas();
-                break;
-        }
+        // Obtener el total de registros para el filtro
+        int totalRegistros = _repository.ContarTareas(filtro);
         
-        // Aplicar ordenamiento
-        return orden switch
+        // Obtener la página de tareas
+        var items = _repository.ObtenerTareasPaginadas(filtro, orden, skip, tamañoPagina);
+        
+        return new ResultadoPaginado<Tarea>
         {
-            OrdenTareas.Prioridad => tareas.OrderByDescending(t => t.Prioridad).ToList(),
-            OrdenTareas.Estado => tareas.OrderBy(t => t.Completada).ToList(),
-            OrdenTareas.FechaCreacion or _ => tareas.OrderByDescending(t => t.FechaCreacion).ToList()
+            Items = items,
+            TotalRegistros = totalRegistros
         };
     }
     
@@ -171,24 +168,4 @@ public class TareaService
         
         _repository.Eliminar(id);
     }
-}
-
-/// <summary>
-/// Opciones de filtrado de tareas
-/// </summary>
-public enum FiltroTareas
-{
-    Todas,
-    Pendientes,
-    Completadas
-}
-
-/// <summary>
-/// Opciones de ordenamiento de tareas
-/// </summary>
-public enum OrdenTareas
-{
-    FechaCreacion,
-    Prioridad,
-    Estado
 }

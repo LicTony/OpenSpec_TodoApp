@@ -11,6 +11,15 @@ La aplicación debe mostrar una lista de tareas clara y legible, donde cada elem
 - **AND** cada tarea muestra su Descripción, Prioridad y Estado.
 - **AND** las tareas completadas se diferencian visualmente (ej. texto tachado, color atenuado).
 
+### Requirement: Visualización de lista de tareas con límite
+
+La lista principal de tareas ya no mostrará la totalidad de las tareas existentes, sino que estará limitada al conjunto devuelto por la página actual.
+
+#### Scenario: Sincronización con el tamaño de página
+
+- **WHEN** Se define un tamaño de página de 10 tareas.
+- **THEN** La lista visual en `MainWindow` nunca debe exceder los 10 elementos simultáneos, independientemente del total de tareas en la base de datos.
+
 ### Requirement: Gestión de Estado de Tareas
 
 El usuario debe poder cambiar el estado de una tarea directamente desde la interfaz principal.

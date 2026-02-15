@@ -113,6 +113,56 @@ public class TareaRepository
         
         return tareas.Select(MapearDtoATarea).ToList();
     }
+
+    /// <summary>
+    /// Cuenta el total de tareas según el filtro aplicado
+    /// </summary>
+    public int ContarTareas(FiltroTareas filtro)
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        
+        var sql = "SELECT COUNT(*) FROM Tareas";
+        
+        if (filtro == FiltroTareas.Pendientes)
+            sql += " WHERE Completada = 0";
+        else if (filtro == FiltroTareas.Completadas)
+            sql += " WHERE Completada = 1";
+            
+        return connection.ExecuteScalar<int>(sql);
+    }
+
+    /// <summary>
+    /// Obtiene una página de tareas con filtros y ordenamiento
+    /// </summary>
+    public List<Tarea> ObtenerTareasPaginadas(FiltroTareas filtro, OrdenTareas orden, int skip, int take)
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        
+        var sql = "SELECT * FROM Tareas";
+        
+        // Filtro
+        if (filtro == FiltroTareas.Pendientes)
+            sql += " WHERE Completada = 0";
+        else if (filtro == FiltroTareas.Completadas)
+            sql += " WHERE Completada = 1";
+
+        // Ordenamiento
+        var orderBy = orden switch
+        {
+            OrdenTareas.Prioridad => "Prioridad DESC, FechaCreacion DESC",
+            OrdenTareas.Estado => "Completada ASC, FechaCreacion DESC",
+            _ => "FechaCreacion DESC"
+        };
+        
+        sql += $" ORDER BY {orderBy}";
+        
+        // Paginación
+        sql += " LIMIT @Take OFFSET @Skip";
+
+        var tareas = connection.Query<TareaDto>(sql, new { Skip = skip, Take = take }).ToList();
+        
+        return tareas.Select(MapearDtoATarea).ToList();
+    }
     
     /// <summary>
     /// Marca una tarea como completada con timestamp
