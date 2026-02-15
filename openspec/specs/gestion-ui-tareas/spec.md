@@ -68,12 +68,39 @@ La ventana principal debe presentarse de manera profesional y maximizada.
 - **THEN** la ventana aparece maximizada.
 - **AND** el título de la ventana es "Todo App".
 
+### Requirement: Prioridad en Creación
+
+El usuario debe poder especificar la prioridad de una nueva tarea al momento de crearla.
+
+#### Scenario: Crear con Prioridad Alta
+
+- **WHEN** el usuario selecciona "Alta" en el selector de prioridad y agrega una tarea
+- **THEN** la tarea se crea con prioridad Alta.
+
+### Requirement: Control de Ordenamiento
+
+La interfaz debe permitir reordenar la lista de tareas según diferentes criterios.
+
+#### Scenario: Ordenar por Prioridad
+
+- **WHEN** el usuario selecciona "Prioridad" en el control de orden
+- **THEN** las tareas se reordenan mostrando primero las de prioridad Alta, luego Media, luego Baja.
+
+#### Scenario: Ordenar por Estado
+
+- **WHEN** el usuario selecciona "Estado" en el control de orden
+- **THEN** las tareas pendientes se muestran antes que las completadas.
+
 ### Requirement: Edición de Tareas
 
-El usuario debe poder modificar la descripción de una tarea existente.
+El sistema debe permitir editar múltiples atributos de una tarea (descripción, prioridad, estado) en una sola acción.
 
-#### Scenario: Editar Descripción
+#### Scenario: Abrir Diálogo de Edición
 
-- **WHEN** el usuario selecciona la opción de editar en una tarea
-- **THEN** se le solicita la nueva descripción.
-- **AND** al confirmar, la tarea se actualiza en la lista y en la base de datos.
+- **WHEN** el usuario solicita editar una tarea
+- **THEN** se muestra un diálogo con los valores actuales de la tarea (descripción, prioridad, estado).
+
+#### Scenario: Guardar Cambios
+
+- **WHEN** el usuario modifica los valores en el diálogo y confirma
+- **THEN** la tarea se actualiza con los nuevos valores y el diálogo se cierra.

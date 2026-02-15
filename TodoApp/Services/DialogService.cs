@@ -24,4 +24,14 @@ public class DialogService : IDialogService
         }
         return null;
     }
+    
+    public (bool Confirmed, string Descripcion, Models.Prioridad Prioridad, bool Completada) ShowEditTaskDialog(string descripcion, Models.Prioridad prioridad, bool completada)
+    {
+        var dialog = new TaskDialog(descripcion, prioridad, completada);
+        if (dialog.ShowDialog() == true)
+        {
+            return (true, dialog.Descripcion, dialog.Prioridad, dialog.Completada);
+        }
+        return (false, string.Empty, Models.Prioridad.Media, false);
+    }
 }

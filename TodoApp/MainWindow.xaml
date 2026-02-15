@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TodoApp"
         xmlns:services="clr-namespace:TodoApp.Services"
+        xmlns:models="clr-namespace:TodoApp.Models"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Todo App" Height="450" Width="800" WindowState="Maximized">
@@ -14,6 +15,20 @@
                             ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="services:FiltroTareas"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="PrioridadValues"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="models:Prioridad"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="OrdenTareasValues"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="services:OrdenTareas"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
@@ -34,6 +49,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox Text="{Binding NuevaTareaDescripcion, UpdateSourceTrigger=PropertyChanged}" 
                      FontSize="16" Padding="10" VerticalContentAlignment="Center"
@@ -42,13 +58,22 @@
                     <KeyBinding Key="Enter" Command="{Binding AgregarTareaCommand}"/>
                 </TextBox.InputBindings>
             </TextBox>
-            <Button Grid.Column="1" Content="Add Task" Command="{Binding AgregarTareaCommand}" 
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Source={StaticResource PrioridadValues}}"
+                      SelectedItem="{Binding NuevaTareaPrioridad}"
+                      Width="100" Margin="10,0,0,0" VerticalContentAlignment="Center" Padding="5" 
+                      ToolTip="Prioridad"/>
+            <Button Grid.Column="2" Content="Add Task" Command="{Binding AgregarTareaCommand}" 
                     Padding="20,10" Margin="10,0,0,0" Background="#007ACC" Foreground="White" BorderThickness="0"/>
         </Grid>
 
         <!-- Filter Bar -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
-            <TextBlock Text="Filter:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBlock Text="Order:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#666"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource OrdenTareasValues}}"
+                      SelectedItem="{Binding OrdenActual}"
+                      Width="120" VerticalContentAlignment="Center" Padding="5" Margin="0,0,20,0"/>
+
+            <TextBlock Text="Filter:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#666"/>
             <ComboBox ItemsSource="{Binding Source={StaticResource FiltroTareasValues}}"
                       SelectedItem="{Binding FiltroActual}"
                       Width="120" VerticalContentAlignment="Center" Padding="5"/>

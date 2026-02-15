@@ -121,6 +121,43 @@ public class TareaService
     }
 
     /// <summary>
+    /// Actualiza todos los datos de una tarea
+    /// </summary>
+    public void ActualizarTarea(int id, string descripcion, Prioridad prioridad, bool completada)
+    {
+        if (string.IsNullOrWhiteSpace(descripcion))
+        {
+            throw new ArgumentException("La descripción no puede estar vacía", nameof(descripcion));
+        }
+
+        var tarea = _repository.ObtenerPorId(id);
+        
+        if (tarea == null)
+        {
+            throw new InvalidOperationException($"No se encontró la tarea con ID {id}");
+        }
+
+        tarea.Descripcion = descripcion.Trim();
+        tarea.Prioridad = prioridad;
+        
+        if (tarea.Completada != completada)
+        {
+             if (completada) 
+             {
+                 tarea.Completada = true;
+                 tarea.FechaCompletada = DateTime.Now;
+             }
+             else
+             {
+                 tarea.Completada = false;
+                 tarea.FechaCompletada = null;
+             }
+        }
+
+        _repository.Actualizar(tarea);
+    }
+
+    /// <summary>
     /// Elimina una tarea con validación de existencia
     /// </summary>
     public void EliminarTarea(int id)

@@ -15,7 +15,13 @@ public sealed partial class MainViewModel : ObservableObject
     private string _nuevaTareaDescripcion = string.Empty;
 
     [ObservableProperty]
+    private Prioridad _nuevaTareaPrioridad = Prioridad.Media;
+
+    [ObservableProperty]
     private FiltroTareas _filtroActual = FiltroTareas.Todas;
+
+    [ObservableProperty]
+    private OrdenTareas _ordenActual = OrdenTareas.FechaCreacion;
 
     [ObservableProperty]
     private ObservableCollection<Tarea> _tareas;
@@ -31,7 +37,7 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void CargarTareas()
     {
-        var tareas = _tareaService.ObtenerTareas(FiltroActual);
+        var tareas = _tareaService.ObtenerTareas(FiltroActual, OrdenActual);
         Tareas = new ObservableCollection<Tarea>(tareas);
     }
 
@@ -46,8 +52,9 @@ public sealed partial class MainViewModel : ObservableObject
 
         try
         {
-            _tareaService.CrearTarea(NuevaTareaDescripcion);
+            _tareaService.CrearTarea(NuevaTareaDescripcion, NuevaTareaPrioridad);
             NuevaTareaDescripcion = string.Empty;
+            NuevaTareaPrioridad = Prioridad.Media;
             CargarTareas();
         }
         catch (Exception ex)
@@ -75,16 +82,16 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (tarea == null) return;
 
-        var nuevaDescripcion = _dialogService.Prompt(
-            "Ingrese la nueva descripción:",
-            "Editar Tarea",
-            tarea.Descripcion);
+        var result = _dialogService.ShowEditTaskDialog(
+            tarea.Descripcion,
+            tarea.Prioridad,
+            tarea.Completada);
 
-        if (!string.IsNullOrWhiteSpace(nuevaDescripcion) && nuevaDescripcion != tarea.Descripcion)
+        if (result.Confirmed)
         {
             try
             {
-                _tareaService.ActualizarDescripcion(tarea.Id, nuevaDescripcion);
+                _tareaService.ActualizarTarea(tarea.Id, result.Descripcion, result.Prioridad, result.Completada);
                 CargarTareas();
             }
             catch (Exception ex)
@@ -104,6 +111,11 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     partial void OnFiltroActualChanged(FiltroTareas value)
+    {
+        CargarTareas();
+    }
+
+    partial void OnOrdenActualChanged(OrdenTareas value)
     {
         CargarTareas();
     }
